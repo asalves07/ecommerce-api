@@ -4,8 +4,8 @@ RSpec.describe "Admin::V1::Categories as :client", type: :request do
   let(:user) { create(:user, profile: :client)}
 
   context "GET /categories" do
-    let(:url) {"/admin/v1/categories"}
-    let!(:categories) {create_list(:category, 5)}
+    let(:url) { "/admin/v1/categories" }
+    let!(:categories) { create_list(:category, 5) }
 
     before(:each) {get url, headers: auth_header(user)}
     include_examples "forbidden access"
