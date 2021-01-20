@@ -97,7 +97,7 @@ RSpec.describe "Admin::V1::Coupons  as :admin", type: :request do
         {coupon: attributes_for(:coupon, code: nil)}.to_json
       end
 
-      it 'does not update category' do
+      it 'does not update Coupon' do
         old_code = coupon.code
         patch url, headers: auth_header(user), params: coupon_invalid_params
         coupon.reload
