@@ -1,32 +1,33 @@
 require 'rails_helper'
 
 RSpec.describe "Admin::V1::Categories as without euthentication", type: :request do
-  context "GET /categories" do
-    let(:url) {"/admin/v1/categories"}
-    let!(:categories) {create_list(:category, 5)}
+  
+  context "GET /coupons" do
+    let(:url) {"/admin/v1/coupons"}
+    let!(:coupons) {create_list(:coupon, 5)}
 
     before(:each) {get url}
     include_examples "unauthenticated access"
   end
 
-  context "POST /categories" do
-    let(:url) {"/admin/v1/categories"}
+  context "POST /coupons" do
+    let(:url) {"/admin/v1/coupons"}
 
     before(:each) {post url}
     include_examples "unauthenticated access"
   end
 
-  context "PATCH /categories/:id" do
-    let(:category) { create(:category)}
-    let(:url) {"/admin/v1/categories/#{category.id}"}
+  context "PATCH /coupons/:id" do
+    let(:coupon) { create(:coupon)}
+    let(:url) {"/admin/v1/coupons/#{coupon.id}"}
 
     before(:each) {patch url}
     include_examples "unauthenticated access"
   end
 
-  context "DELETE /categories/:id" do
-    let!(:category) { create(:category)}
-    let(:url) {"/admin/v1/categories/#{category.id}"}
+  context "DELETE /coupons/:id" do
+    let!(:coupon) { create(:coupon)}
+    let(:url) {"/admin/v1/coupons/#{coupon.id}"}
 
     before(:each) {delete url}
     include_examples "unauthenticated access"
