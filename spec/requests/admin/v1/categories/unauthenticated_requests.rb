@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "Admin::V1::Categories as without euthentication", type: :request do
+RSpec.describe "Admin::V1::Categories as without authentication", type: :request do
   
   context "GET /coupons" do
     let(:url) {"/admin/v1/coupons"}
