@@ -10,6 +10,8 @@ class Product < ApplicationRecord
 
   has_one_attached :image
   validates :image, presence: true
+  validates :status, presence: true
+  enum status: {available: 1, unavailable: 2}
 
   include NameSearchable
   include Paginatable
