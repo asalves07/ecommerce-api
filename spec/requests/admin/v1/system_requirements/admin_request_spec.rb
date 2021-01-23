@@ -5,11 +5,97 @@ RSpec.describe "Admin::V1::SystemRequirements as :admin", type: :request do
 
   context "GET /system_requirements" do
     let(:url) {"/admin/v1/system_requirements"}
-    let!(:system_requirements) {create_list(:system_requirement, 5)}
+    let!(:system_requirements) {create_list(:system_requirement, 10)}
 
-    it "returns all Systen requirements" do
+    context "without any params" do
+      it "returns 10 system requirements" do
+        get url, headers: auth_header(user)
+        expect(body_json['system_requirements'].count).to eq 10
+      end
+      
+      it "returns 10 first system requirements" do
+        get url, headers: auth_header(user)
+        expected_system_requirements = system_requirements[0..9].as_json(only: %i(id name operational_system storage processor memory video_board))
+        expect(body_json['system_requirements']).to contain_exactly *expected_system_requirements
+      end
+
+      it "returns success status" do
+        get url, headers: auth_header(user)
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "with search[name] param" do
+      let!(:search_name_system_requirements) do
+        system_requirements = [] 
+        15.times { |n| system_requirements << create(:system_requirement, name: "Search #{n + 1}") }
+        system_requirements 
+      end
+
+      let(:search_params) { { search: { name: "Search" } } }
+
+      it "returns only seached system requirements limited by default pagination" do
+        get url, headers: auth_header(user), params: search_params
+        expected_system_requirements = search_name_system_requirements[0..9].map do |system_requirement|
+          system_requirement.as_json(only: %i(id name operational_system storage processor memory video_board))
+        end
+        expect(body_json['system_requirements']).to contain_exactly *expected_system_requirements
+      end
+
+      it "returns success status" do
+        get url, headers: auth_header(user), params: search_params
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "with pagination params" do
+      let(:page) { 2 }
+      let(:length) { 5 }
+
+      let(:pagination_params) { { page: page, length: length } }
+
+      it "returns records sized by :length" do
+        get url, headers: auth_header(user), params: pagination_params
+        expect(body_json['system_requirements'].count).to eq length
+      end
+      
+      it "returns categories limited by pagination" do
+        get url, headers: auth_header(user), params: pagination_params
+        expected_system_requirements = system_requirements[5..9].as_json(only: %i(id name operational_system storage processor memory video_board))
+        expect(body_json['system_requirements']).to contain_exactly *expected_system_requirements
+      end
+
+      it "returns success status" do
+        get url, headers: auth_header(user), params: pagination_params
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "with order params" do
+      let(:order_params) { { order: { name: 'desc' } } }
+
+      it "returns ordered system requirements limited by default pagination" do
+        get url, headers: auth_header(user), params: order_params
+        system_requirements.sort! { |a, b| b[:name] <=> a[:name]}
+        expected_system_requirements = system_requirements[0..9].as_json(only: %i(id name operational_system storage processor memory video_board))
+        expect(body_json['system_requirements']).to contain_exactly *expected_system_requirements
+      end
+ 
+      it "returns success status" do
+        get url, headers: auth_header(user), params: order_params
+        expect(response).to have_http_status(:ok)
+      end
+    end
+  end
+
+  context "GET /system_requirements/:id" do
+    let(:system_requirement) { create(:system_requirement)}
+    let(:url) { "/admin/v1/system_requirements/#{system_requirement.id}" }
+    
+    it "returns requested system requirement" do
       get url, headers: auth_header(user)
-      expect(body_json['system_requirements']).to contain_exactly *system_requirements.as_json(only: %i(id name operational_system storage processor memory video_board))
+      expect_system_requirement = system_requirement.as_json(only: %i(id name operational_system storage processor memory video_board))
+      expect(body_json['system_requirement']).to eq expect_system_requirement
     end
 
     it "returns success status" do
