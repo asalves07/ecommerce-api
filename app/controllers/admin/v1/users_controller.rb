@@ -1,9 +1,9 @@
 module Admin::V1
   class UsersController < ApiController
-    before_action :load_user, only: [:update, :destroy]
+    before_action :load_user, only: [:update, :destroy, :show]
 
     def index
-      @users = User.where.not(id: @current_user.id)
+      @users = load_users
     end
 
     def create
@@ -29,6 +29,11 @@ module Admin::V1
 
     def load_user
       @user = User.find(params[:id])
+    end
+
+    def load_users
+      permitted = params.permit({search: :name}, {order: {}}, :page, :length)
+      Admin::ModelLoadingService.new(User.where.not(id: @current_user.id), permitted).call
     end
 
     def user_params
