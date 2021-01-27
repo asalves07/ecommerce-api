@@ -1,0 +1,1 @@
+json.(game, :mode, :realease_date, :developer)
