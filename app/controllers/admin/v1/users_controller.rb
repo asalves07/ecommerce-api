@@ -32,7 +32,7 @@ module Admin::V1
     end
 
     def load_users
-      permitted = params.permit({search: :name}, {order: {}}, :page, :length)
+      permitted = params.permit({ search: :name }, { order: {} }, :page, :length)
       Admin::ModelLoadingService.new(User.where.not(id: @current_user.id), permitted).call
     end
 
