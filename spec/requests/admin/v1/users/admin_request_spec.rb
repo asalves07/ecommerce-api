@@ -62,11 +62,11 @@ RSpec.describe "Admin V1 Users as :admin", type: :request do
         get url, headers: auth_header(login_user), params: pagination_params
         expect(body_json['users'].count).to eq length
       end
-      
+
       it "returns users limited by pagination" do
         get url, headers: auth_header(login_user), params: pagination_params
         expected_users = users[5..9].as_json(
-          only: %i(id name email profile)
+          only: %i[id name email profile]
         )
         expect(body_json['users']).to contain_exactly *expected_users
       end
