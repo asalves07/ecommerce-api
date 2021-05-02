@@ -30,7 +30,7 @@ module Admin::V1
     private
 
     def load_products
-      permitted = params.permit({searh: :name}, {order: {}}, :page, :length)
+      permitted = params.permit({ search: :name }, { order: {} }, :page, :length)
       Admin::ModelLoadingService.new(Product.all, permitted).call
     end
 
