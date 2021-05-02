@@ -21,14 +21,13 @@ describe Admin::ModelLoadingService do
         expect(result_categories.count).to eq 4
       end
 
-      it "returns records following pagination" do
+      it "returns records following search, order and pagination" do
         search_categories.sort! { |a, b| b[:name] <=> a[:name] }
         service = described_class.new(Category.all, params)
         result_categories = service.call
         expect_categories = search_categories[4..7]
         expect(result_categories).to contain_exactly *expect_categories
       end
-
     end
     
     context "when params are not present" do
@@ -45,8 +44,5 @@ describe Admin::ModelLoadingService do
         expect(result_categories).to contain_exactly *expect_categories
       end
     end
-    
-
-
   end
 end
