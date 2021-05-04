@@ -6,7 +6,7 @@ RSpec.describe Coupon, type: :model do
 
   it { is_expected.to validate_presence_of(:status) }
   it { is_expected.to define_enum_for(:status).with_values({active: 1, inactive: 2})}
-  
+
   it { is_expected.to validate_presence_of(:due_date) }
   it { is_expected.to validate_presence_of(:discount_value) }
   it { is_expected.to validate_numericality_of(:discount_value).is_greater_than(0)}
@@ -29,6 +29,7 @@ RSpec.describe Coupon, type: :model do
     expect(subject.errors.keys).to_not include :due_date
   end
 
+  it_has_behavior_of 'like searchable concern', :coupon, :code
   it_behaves_like "paginatable concern", :coupon
 
 end
