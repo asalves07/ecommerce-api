@@ -26,6 +26,9 @@ RSpec.describe "Admin V1 Users as :admin", type: :request do
         expect(response).to have_http_status(:ok)
       end
 
+      it_behaves_like 'pagination meta attributes', { page: 1, length: 10, total: 10, total_pages: 1 } do
+        before { get url, headers: auth_header(login_user) }
+      end
     end
 
     context "with search[name] param" do
@@ -50,6 +53,9 @@ RSpec.describe "Admin V1 Users as :admin", type: :request do
         expect(response).to have_http_status(:ok)
       end
 
+      it_behaves_like 'pagination meta attributes', { page: 1, length: 10, total: 15, total_pages: 2 } do
+        before { get url, headers: auth_header(login_user), params: search_params }
+      end
     end
 
     context "with pagination params" do
@@ -62,11 +68,11 @@ RSpec.describe "Admin V1 Users as :admin", type: :request do
         get url, headers: auth_header(login_user), params: pagination_params
         expect(body_json['users'].count).to eq length
       end
-
+      
       it "returns users limited by pagination" do
         get url, headers: auth_header(login_user), params: pagination_params
         expected_users = users[5..9].as_json(
-          only: %i[id name email profile]
+          only: %i(id name email profile)
         )
         expect(body_json['users']).to contain_exactly *expected_users
       end
@@ -76,6 +82,9 @@ RSpec.describe "Admin V1 Users as :admin", type: :request do
         expect(response).to have_http_status(:ok)
       end
 
+      it_behaves_like 'pagination meta attributes', { page: 2, length: 5, total: 10, total_pages: 2 } do
+        before { get url, headers: auth_header(login_user), params: pagination_params }
+      end
     end
 
     context "with order params" do
@@ -93,6 +102,10 @@ RSpec.describe "Admin V1 Users as :admin", type: :request do
       it "returns success status" do
         get url, headers: auth_header(login_user), params: order_params
         expect(response).to have_http_status(:ok)
+      end
+
+      it_behaves_like 'pagination meta attributes', { page: 1, length: 10, total: 10, total_pages: 1 } do
+        before { get url, headers: auth_header(login_user), params: order_params }
       end
     end
   end

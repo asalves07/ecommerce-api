@@ -3,18 +3,18 @@ require 'rails_helper'
 RSpec.describe "Admin V1 Products as :admin", type: :request do
   let(:user) { create(:user) }
 
-  context 'GET /products' do
-    let(:url) { '/admin/v1/products' }
+  context "GET /products" do
+    let(:url) { "/admin/v1/products" }
     let!(:categories) { create_list(:category, 2) }
     let!(:products) { create_list(:product, 10, categories: categories) }
 
-    context 'without any params' do
-      it 'returns 10 records' do
+    context "without any params" do
+      it "returns 10 records" do
         get url, headers: auth_header(user)
         expect(body_json['products'].count).to eq 10
       end
-
-      it 'returns Products with :productable following default pagination' do
+      
+      it "returns Products with :productable following default pagination" do
         get url, headers: auth_header(user)
         expected_return = products[0..9].map do |product| 
           build_game_product_json(product)
@@ -22,22 +22,26 @@ RSpec.describe "Admin V1 Products as :admin", type: :request do
         expect(body_json['products']).to contain_exactly *expected_return
       end
 
-      it 'returns success status' do
+      it "returns success status" do
         get url, headers: auth_header(user)
         expect(response).to have_http_status(:ok)
       end
+
+      it_behaves_like 'pagination meta attributes', { page: 1, length: 10, total: 10, total_pages: 1 } do
+        before { get url, headers: auth_header(user) }
+      end
     end
 
-    context 'with search[name] param' do
+    context "with search[name] param" do
       let!(:search_name_products) do
-        products = []
+        products = [] 
         15.times { |n| products << create(:product, name: "Search #{n + 1}") }
-        products
+        products 
       end
 
-      let(:search_params) { { search: { name: 'Search' } } }
+      let(:search_params) { { search: { name: "Search" } } }
 
-      it 'returns only seached products limited by default pagination' do
+      it "returns only seached products limited by default pagination" do
         get url, headers: auth_header(user), params: search_params
         expected_return = search_name_products[0..9].map do |product|
           build_game_product_json(product)
@@ -48,6 +52,10 @@ RSpec.describe "Admin V1 Products as :admin", type: :request do
       it "returns success status" do
         get url, headers: auth_header(user), params: search_params
         expect(response).to have_http_status(:ok)
+      end
+
+      it_behaves_like 'pagination meta attributes', { page: 1, length: 10, total: 15, total_pages: 2 } do
+        before { get url, headers: auth_header(user), params: search_params }
       end
     end
 
@@ -74,6 +82,10 @@ RSpec.describe "Admin V1 Products as :admin", type: :request do
         get url, headers: auth_header(user), params: pagination_params
         expect(response).to have_http_status(:ok)
       end
+
+      it_behaves_like 'pagination meta attributes', { page: 2, length: 5, total: 10, total_pages: 2 } do
+        before { get url, headers: auth_header(user), params: pagination_params }
+      end
     end
 
     context "with order params" do
@@ -87,21 +99,25 @@ RSpec.describe "Admin V1 Products as :admin", type: :request do
         end
         expect(body_json['products']).to contain_exactly *expected_return
       end
-
-      it 'returns success status' do
+ 
+      it "returns success status" do
         get url, headers: auth_header(user), params: order_params
         expect(response).to have_http_status(:ok)
+      end
+
+      it_behaves_like 'pagination meta attributes', { page: 1, length: 10, total: 10, total_pages: 1 } do
+        before { get url, headers: auth_header(user), params: order_params }
       end
     end
   end
 
-  context 'POST /products' do
-    let(:url) { '/admin/v1/products' }
+  context "POST /products" do
+    let(:url) { "/admin/v1/products" }
     let(:categories) { create_list(:category, 2) }
     let(:system_requirement) { create(:system_requirement) }
     let(:post_header) { auth_header(user, merge_with: { 'Content-Type' => 'multipart/form-data' }) }
-
-    context 'with valid params' do
+    
+    context "with valid params" do
       let(:game_params) { attributes_for(:game, system_requirement_id: system_requirement.id) }
       let(:product_params) do 
         { product: attributes_for(:product).merge(category_ids: categories.map(&:id))
@@ -431,5 +447,5 @@ def build_game_product_json(product)
   json['categories'] = product.categories.map(&:name)
   json['image_url'] = rails_blob_url(product.image)
   json['productable'] = product.productable_type.underscore
-  json.merge! product.productable.as_json(only: %i(mode release_date developer))
+  json.merge product.productable.as_json(only: %i(mode release_date developer))
 end
