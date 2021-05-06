@@ -1,18 +1,21 @@
 module Admin::V1
   class CouponsController < ApiController
     before_action :load_coupon, only: [:show, :update, :destroy]
-
+    
     def index
-      @coupons = Coupon.all
+      permitted = params.permit({ search: :name }, { order: {} }, :page, :length)
+      @loading_service = Admin::ModelLoadingService.new(Coupon.all, permitted)
+      @loading_service.call
     end
-
-    def show; end
 
     def create
       @coupon = Coupon.new
       @coupon.attributes = coupon_params
       save_coupon!
     end
+
+
+    def show; end
 
     def update
       @coupon.attributes = coupon_params
@@ -22,7 +25,7 @@ module Admin::V1
     def destroy
       @coupon.destroy!
     rescue
-      render_error(fields: @coupon.errors.message)
+      render_error(fields: @coupon.errors.messages)
     end
 
     private
@@ -33,7 +36,7 @@ module Admin::V1
 
     def coupon_params
       return {} unless params.has_key?(:coupon)
-      params.require(:coupon).permit(:id, :code, :status, :discount_value, :due_date)
+      params.require(:coupon).permit(:id, :name, :code, :status, :discount_value, :due_date)
     end
 
     def save_coupon!

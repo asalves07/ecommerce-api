@@ -49,6 +49,7 @@ ActiveRecord::Schema.define(version: 2021_05_02_203314) do
     t.datetime "due_date"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "name"
   end
 
   create_table "games", force: :cascade do |t|
