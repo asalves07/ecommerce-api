@@ -3,3 +3,4 @@ pt-BR:
   activerecord:
     errors:
       future_date: "Deve ser uma data futura"
+      invalidcpf_cnpj: "Deve ser um CPF ou CNPJ válido"
