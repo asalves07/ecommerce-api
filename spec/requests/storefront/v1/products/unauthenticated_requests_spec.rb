@@ -378,7 +378,7 @@ RSpec.describe "Storefront V1 Home", type: :request do
 
     it "returns right count this products was favorited" do
       create_list(:wish_item, 5, product: product)
-      get url headers: unauthenticated_header
+      get url, headers: unauthenticated_header
       expect(body_json['product']['favorited_count']).to eq 5
     end
   end
