@@ -3,7 +3,7 @@ module JunoApi
     include HTTParty
 
     PATH = '/authorization-server/oauth/token'
-    LIMITE_RATE_TO_RENEW = 90
+    LIMIT_RATE_TO_RENEW = 90
     SECONDS_TO_WAIT_PROCESSING = 0.5
 
     base_uri "#{JUNO_AUTH_URL}"
@@ -53,7 +53,7 @@ module JunoApi
     end
 
     def self.is_about_expire?(instance)
-      expiration_rate = LIMITE_RATE_TO_RENEW / 100.0
+      expiration_rate = LIMIT_RATE_TO_RENEW / 100.0
       instance.request_time + instance.expires_in * expiration_rate < Time.zone.now
     end
   end
