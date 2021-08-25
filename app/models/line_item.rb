@@ -16,6 +16,11 @@ class LineItem < ApplicationRecord
     payed_price * quantity
   end
 
+  def ship!
+    product.productable.ship!(self)
+    update!(status: :preparing)
+  end
+
   private
 
   def set_default_status
